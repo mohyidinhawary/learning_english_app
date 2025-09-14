@@ -26,6 +26,10 @@ Route::prefix('api')
         Route::get('user/v1/chapter-lessons/{id}', [LessonController::class, 'showchapterlessons']);
          Route::get('user/v1/exercies/{id}', [ExerciesController::class, 'showexercies']);
           Route::post('user/v1/answer-exercies/{id}', [ExerciesController::class, 'answerexercies']);
+            Route::get('user/v1/lesson-words/{id}', [LessonController::class, 'showlessonwords']);
+              Route::get('user/v1/lesson-sentences/{id}', [LessonController::class, 'showlessonsentence']);
+               Route::get('user/v1/word/{id}', [LessonController::class, 'showword']);
+              Route::get('user/v1/sentence/{id}', [LessonController::class, 'showsentence']);
     });
 
 
