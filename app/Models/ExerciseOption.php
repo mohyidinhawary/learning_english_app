@@ -10,10 +10,10 @@ class ExerciseOption extends Model
     /** @use HasFactory<\Database\Factories\ExerciseOptionFactory> */
     use HasFactory;
 
-     protected $fillable = ['exercise_instance_id','label','value','is_correct'];
+     protected $fillable = ['template_id','label','value','is_correct'];
     protected $casts = ['is_correct' => 'boolean'];
 
-    public function instance() { return $this->belongsTo(ExerciseInstance::class, 'exercise_instance_id'); }
+    // public function instance() { return $this->belongsTo(ExerciseInstance::class, 'exercise_instance_id'); }
     public function attemptsSelected() { return $this->hasMany(Attempt::class, 'selected_option_id'); }
 
     public function template()
