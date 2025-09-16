@@ -30,6 +30,7 @@ Route::prefix('api')
               Route::get('user/v1/lesson-sentences/{id}', [LessonController::class, 'showlessonsentence']);
                Route::get('user/v1/word/{id}', [LessonController::class, 'showword']);
               Route::get('user/v1/sentence/{id}', [LessonController::class, 'showsentence']);
+                  Route::get('user/v1/review-mistakes/{id}', [LessonController::class, 'reviewMistakes']);
     });
 
 

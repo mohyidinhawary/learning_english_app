@@ -13,6 +13,7 @@ use App\Http\Resources\WordResource;
 use App\Http\Resources\WordSentenceResource;
 use App\Models\Word;
 use App\Models\WordSentence;
+use App\Models\ExerciseInstance;
 
 class LessonController extends Controller
 {
@@ -67,6 +68,57 @@ public function showword($id){
         'sentences' =>new WordSentenceResource($sentence),
     ]);
    }
+
+
+
+
+
+   public function reviewMistakes($lessonId)
+{
+    $userId = auth()->id();
+
+    // كل التمارين الغلط لهالطالب بهالدرس
+    $incorrectInstances = ExerciseInstance::with('template.options')
+        ->where('user_id', $userId)
+        ->where('lesson_id', $lessonId)
+        ->where('status', 'answered_incorrect')
+        ->get();
+
+    if ($incorrectInstances->isEmpty()) {
+        return RB::success([
+            'message' => 'ما عندك أخطاء، كل الإجابات صحيحة 👏',
+            'mistakes' => [],
+        ]);
+    }
+
+    return RB::success([
+    'message' => 'رجع جاوب على الأخطاء لتكمل الدرس',
+    "mistakes_count"=>$incorrectInstances->count(),
+    'mistakes' => $incorrectInstances->map(function ($instance) {
+        return [
+            'exercise_id' => $instance->id,
+            'question'    => $instance->template->question,
+            // 'settings'    => $instance->template->settings,
+            // 'options'     => $instance->template->options->map(function ($opt) {
+            //     return [
+            //         'id'    => $opt->id,
+            //         'value' => $opt->value,
+            //     ];
+            // }),
+            // 🔹 هون عم نجيب كل المحاولات مع تفاصيلها
+            'attempts'    => $instance->attempts->map(function ($attempt) {
+                return [
+                    'attempt_no'   => $attempt->attempt_no,
+                    'user_answer'  => $attempt->answer_text,
+                    // 'is_correct'   => (bool) $attempt->is_correct,
+                    // 'used_hint'    => (bool) $attempt->used_hint,
+                    // 'created_at'   => $attempt->created_at->toDateTimeString(),
+                ];
+            }),
+        ];
+    }),
+]);
+}
 
 
 
