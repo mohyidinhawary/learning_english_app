@@ -134,13 +134,13 @@ public function answerexercies(AnswerQuestionRequest $request, $id)
 
     // ✅ XP والإحصائيات
     if ($isCorrect) {
-        $this->updateUserStats($userId, $exercise->lesson_id, true, false);
+        // $this->updateUserStats($userId, $exercise->lesson_id, true, false);
     } else {
         if ($attemptNo % 3 === 0) {
             $attempt->update(['used_hint' => true]);
-            $this->updateUserStats($userId, $exercise->lesson_id, false, true);
+            // $this->updateUserStats($userId, $exercise->lesson_id, false, true);
         } else {
-            $this->updateUserStats($userId, $exercise->lesson_id, false, false);
+            // $this->updateUserStats($userId, $exercise->lesson_id, false, false);
         }
     }
 
@@ -164,29 +164,45 @@ public function answerexercies(AnswerQuestionRequest $request, $id)
 
 
 
-private function updateUserStats($userId, $lessonId, $isCorrect, $usedHint)
-{
-    $stats = UserLessonStat::firstOrCreate([
-        'user_id'   => $userId,
-        'lesson_id' => $lessonId,
-    ]);
+// private function updateUserStats($userId, $lessonId, $isCorrect, $usedHint)
+// {
+// //
 
-    $stats->attempts_count += 1;
+//  $stats = UserLessonStat::firstOrCreate([
+//         'user_id'   => $userId,
+//         'lesson_id' => $lessonId,
+//     ]);
 
-    if ($isCorrect) {
-    if ($stats->attempts_count == 1) {
-        $stats->xp_earned += 33; // أول محاولة
-        $stats->first_try_count += 1;
-    } elseif ($usedHint) {
-        $stats->xp_earned += 27; // بعد استخدام hint
-    } else {
-        $stats->xp_earned += 30; // بدون hint
-    }
-}
-    if ($usedHint) {
-        $stats->hints_count += 1;
-    }
+//     $stats->attempts_count += 1;
 
-    $stats->save();
-}
+//     // 🔹 احسب نسبة المكافأة حسب عدد مرات التكرار
+//     $repeatCount = $stats->repeats_count ?? 0;
+//     $multiplier = match ($repeatCount) {
+//         0 => 1.0,   // أول مرة → 100%
+//         1 => 0.5,   // ثاني مرة → 50%
+//         2 => 0.2,   // ثالث مرة → 20%
+//         default => 0.0, // أكثر من 3 → ما بياخد XP
+//     };
+
+//     if ($isCorrect) {
+
+//         if ($stats->attempts_count == 1) {
+//             $stats->xp_earned += intval(2 * $multiplier); // أول محاولة
+//             $stats->first_try_count += 1;
+//         } elseif ($usedHint) {
+//             $stats->xp_earned += intval(0.5 * $multiplier); // بعد استخدام hint
+//         } else {
+//             $stats->xp_earned += intval(1 * $multiplier); // بدون hint
+//         }
+//     }
+
+//     if ($usedHint) {
+//         $stats->hints_count += 1;
+//     }
+
+//     $stats->save();
+
+
+
+// }
 }

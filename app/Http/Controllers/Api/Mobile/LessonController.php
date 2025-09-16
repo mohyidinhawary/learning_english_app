@@ -14,7 +14,7 @@ use App\Http\Resources\WordSentenceResource;
 use App\Models\Word;
 use App\Models\WordSentence;
 use App\Models\ExerciseInstance;
-
+use App\Models\UserLessonStat;
 class LessonController extends Controller
 {
    public function showchapterlessons($id){
@@ -118,6 +118,75 @@ public function showword($id){
         ];
     }),
 ]);
+}
+
+
+
+
+
+
+
+
+
+public function finalizeLesson($lessonId)
+{
+    $userId = auth()->id();
+
+    // جيب كل الـ instances تبع الدرس
+    $instances = ExerciseInstance::where('user_id', $userId)
+        ->where('lesson_id', $lessonId)
+        ->with(['attempts' => function ($q) {
+            $q->orderBy('attempt_no', 'asc');
+        }])
+        ->get();
+
+    // تحقق إذا كل التمارين جاوبة صح بالنهاية
+    $allCorrect = $instances->every(fn($i) => $i->status === 'answered_correct');
+
+    if (!$allCorrect) {
+     return RB::asError(400)
+    ->withHttpCode(400)
+    ->withMessage("لسا ما خلصت الدرس، في تمارين ما انحلت صح")
+    ->build();
+    }
+
+    $totalXp = 0;
+
+    foreach ($instances as $instance) {
+        // جيب أول محاولة صحيحة
+        $firstCorrect = $instance->attempts->firstWhere('is_correct', true);
+
+        if (!$firstCorrect) {
+            continue;
+        }
+
+        $attemptNo = $firstCorrect->attempt_no;
+        $usedHint  = $firstCorrect->used_hint;
+
+        if ($attemptNo == 1) {
+            $totalXp += 33; // أول محاولة
+        } elseif ($usedHint) {
+            $totalXp += 27; // صح بعد استخدام hint
+        } else {
+            $totalXp += 30; // صح بعد تكرار بدون hint
+        }
+    }
+
+    // خزّن النتيجة بجدول user_lesson_stats
+    $stats = UserLessonStat::firstOrCreate([
+        'user_id'   => $userId,
+        'lesson_id' => $lessonId,
+    ]);
+
+    $stats->xp_earned = $totalXp;
+    $stats->mastered_at = now();
+    $stats->save();
+
+    return RB::success([
+        'lesson_id' => $lessonId,
+        'xp_total'  => $totalXp,
+        'message'   => "🎉 مبروك! خلصت الدرس وكسبت {$totalXp} XP",
+    ]);
 }
 
 

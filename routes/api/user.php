@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Mobile\Auth\ChangePasswordController;
 use App\Http\Controllers\Api\Mobile\ProfileController;
 use App\Http\Controllers\Api\Mobile\LessonController;
 use App\Http\Controllers\Api\Mobile\ExerciesController;
+use App\Http\Controllers\Api\Mobile\FeedbackController;
 
 Route::prefix('api')->group(function () {
 Route::post('user/v1/register', [AuthController::class, 'register']);
@@ -31,6 +32,8 @@ Route::prefix('api')
                Route::get('user/v1/word/{id}', [LessonController::class, 'showword']);
               Route::get('user/v1/sentence/{id}', [LessonController::class, 'showsentence']);
                   Route::get('user/v1/review-mistakes/{id}', [LessonController::class, 'reviewMistakes']);
+                     Route::get('user/v1/earned-xp/{id}', [LessonController::class, 'finalizeLesson']);
+                        Route::post('user/v1/send-feedback', [FeedbackController::class, 'sendfeedback']);
     });
 
 
