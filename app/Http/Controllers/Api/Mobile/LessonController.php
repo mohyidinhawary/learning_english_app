@@ -162,8 +162,9 @@ public function finalizeLesson($lessonId)
 
         $attemptNo = $firstCorrect->attempt_no;
         $usedHint  = $firstCorrect->used_hint;
-
+$firsttrycount=$firstCorrect->first_try_count;
         if ($attemptNo == 1) {
+$firsttrycount+=1;
             $totalXp += 33; // أول محاولة
         } elseif ($usedHint) {
             $totalXp += 27; // صح بعد استخدام hint
@@ -180,6 +181,7 @@ public function finalizeLesson($lessonId)
 
     $stats->xp_earned = $totalXp;
     $stats->mastered_at = now();
+    $stats->first_try_count=$firsttrycount;
     $stats->save();
 
     return RB::success([

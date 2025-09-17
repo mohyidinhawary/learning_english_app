@@ -134,20 +134,64 @@ public function answerexercies(AnswerQuestionRequest $request, $id)
 
     // ✅ XP والإحصائيات
     if ($isCorrect) {
+         $feedback = "إجابة صحيحة! أحسنت 👏";
         // $this->updateUserStats($userId, $exercise->lesson_id, true, false);
     } else {
+
+        $feedback = "إجابة خاطئة ❌";
+
         if ($attemptNo % 3 === 0) {
             $attempt->update(['used_hint' => true]);
+
+            switch ($exercise->type) {
+            case 'mcq':
+                // حذف خيار غلط
+                $wrongOption = $exercise->options->where('is_correct', false)->random();
+                $hint = "Hint: خيار خاطئ تم حذفه → {$wrongOption->value}";
+                break;
+
+            case 'order':
+                // // كشف أول كلمة صحيحة
+                // $hints = $exercise->settings['hints'] ?? [];
+                // $hint = isset($hints[0]['text']) ? "Hint: الكلمة الأولى هي '{$hints[0]['text']}'" : null;
+
+              $hints = $exercise->settings['hints'] ?? [];
+
+    if (!empty($hints)) {
+        // كل 3 محاولات ننتقل لهينت جديدة
+        $hintIndex = intval(($attemptNo - 1) / 3);
+
+        // إذا ما في كفاية هينتس، كرر آخر وحدة
+        if ($hintIndex >= count($hints)) {
+            $hintIndex = count($hints) - 1;
+        }
+
+        $hint = $hints[$hintIndex]['text'] ?? null;
+    }
+    break;
+            case 'translate':
+            case 'fill_blank':
+            case 'match':
+            case 'listen':
+            case 'speak':
+                $hints = $exercise->settings['hints'] ?? [];
+                $hint = $hints[0]['text'] ?? 'جرّب تركز على أول حرف 😉';
+                break;
+        }
+
+        if ($hint) {
+            $feedback .= " | {$hint}";
+        }
             // $this->updateUserStats($userId, $exercise->lesson_id, false, true);
         } else {
             // $this->updateUserStats($userId, $exercise->lesson_id, false, false);
         }
     }
 
-    // ✅ الرسالة
-    $feedback = $isCorrect
-        ? "إجابة صحيحة! أحسنت 👏"
-        : "إجابة خاطئة ❌" . ($attemptNo % 3 === 0? " | Hint: " . ($exercise->settings['hint'] ?? 'جرّب تركز على أول حرف 😉') : '');
+    // // ✅ الرسالة
+    // $feedback = $isCorrect
+    //     ? "إجابة صحيحة! أحسنت 👏"
+    //     : "إجابة خاطئة ❌" . ($attemptNo % 3 === 0? " | Hint: " . ($exercise->settings['hint'] ?? 'جرّب تركز على أول حرف 😉') : '');
 
     // ✅ رجّع always success
     return RB::success([
@@ -205,4 +249,29 @@ public function answerexercies(AnswerQuestionRequest $request, $id)
 
 
 // }
+public function wordExercises($wordId)
+{
+    $word = \App\Models\Word::with(['exercises.options'])
+        ->findOrFail($wordId);
+
+    return RB::success([
+        'word_id'   => $word->id,
+        'en_text' => $word->en_text ,
+        'exercises' => $word->exercises->map(function ($exercise) {
+            return [
+                'exercise_id' => $exercise->id,
+                'type'        => $exercise->type,
+                'question'    => $exercise->question,
+                // 'settings'    => $exercise->settings,
+                // 'options'     => $exercise->options->map(fn($opt) => [
+                //     'id'     => $opt->id,
+                //     'value'  => $opt->value,
+                //     'correct'=> (bool) $opt->is_correct,
+                // ]),
+            ];
+        }),
+    ]);
+}
+
+
 }
