@@ -10,7 +10,7 @@ class ExercieseTemplate extends Model
     /** @use HasFactory<\Database\Factories\ExercieseTemplateFactory> */
     use HasFactory;
 
-     protected $fillable = ['lesson_id','type','question','settings','status'];
+     protected $fillable = ['lesson_id','word_id','type','question','settings','status'];
     protected $casts = ['settings' => 'array'];
 
     public function lesson() { return $this->belongsTo(Lesson::class); }
@@ -19,4 +19,8 @@ class ExercieseTemplate extends Model
     {
         return $this->hasMany(ExerciseOption::class, 'template_id');
     }
+    public function word()
+{
+    return $this->belongsTo(Word::class, 'word_id');
+}
 }

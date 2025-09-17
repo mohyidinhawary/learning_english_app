@@ -15,4 +15,9 @@ class Word extends Model
 
     public function lesson() { return $this->belongsTo(Lesson::class); }
     public function sentences() { return $this->hasMany(WordSentence::class); }
+
+     public function exercises()
+    {
+        return $this->hasMany(ExercieseTemplate::class, 'word_id');
+    }
 }

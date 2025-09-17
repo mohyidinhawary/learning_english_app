@@ -13,7 +13,8 @@ use App\Http\Resources\WordResource;
 use App\Http\Resources\WordSentenceResource;
 use App\Models\Word;
 use App\Models\WordSentence;
-
+use App\Models\ExerciseInstance;
+use App\Models\UserLessonStat;
 class LessonController extends Controller
 {
    public function showchapterlessons($id){
@@ -67,6 +68,128 @@ public function showword($id){
         'sentences' =>new WordSentenceResource($sentence),
     ]);
    }
+
+
+
+
+
+   public function reviewMistakes($lessonId)
+{
+    $userId = auth()->id();
+
+    // كل التمارين الغلط لهالطالب بهالدرس
+    $incorrectInstances = ExerciseInstance::with('template.options')
+        ->where('user_id', $userId)
+        ->where('lesson_id', $lessonId)
+        ->where('status', 'answered_incorrect')
+        ->get();
+
+    if ($incorrectInstances->isEmpty()) {
+        return RB::success([
+            'message' => 'ما عندك أخطاء، كل الإجابات صحيحة 👏',
+            'mistakes' => [],
+        ]);
+    }
+
+    return RB::success([
+    'message' => 'رجع جاوب على الأخطاء لتكمل الدرس',
+    "mistakes_count"=>$incorrectInstances->count(),
+    'mistakes' => $incorrectInstances->map(function ($instance) {
+        return [
+            'exercise_id' => $instance->id,
+            'question'    => $instance->template->question,
+            // 'settings'    => $instance->template->settings,
+            // 'options'     => $instance->template->options->map(function ($opt) {
+            //     return [
+            //         'id'    => $opt->id,
+            //         'value' => $opt->value,
+            //     ];
+            // }),
+            // 🔹 هون عم نجيب كل المحاولات مع تفاصيلها
+            'attempts'    => $instance->attempts->map(function ($attempt) {
+                return [
+                    'attempt_no'   => $attempt->attempt_no,
+                    'user_answer'  => $attempt->answer_text,
+                    // 'is_correct'   => (bool) $attempt->is_correct,
+                    // 'used_hint'    => (bool) $attempt->used_hint,
+                    // 'created_at'   => $attempt->created_at->toDateTimeString(),
+                ];
+            }),
+        ];
+    }),
+]);
+}
+
+
+
+
+
+
+
+
+
+public function finalizeLesson($lessonId)
+{
+    $userId = auth()->id();
+
+    // جيب كل الـ instances تبع الدرس
+    $instances = ExerciseInstance::where('user_id', $userId)
+        ->where('lesson_id', $lessonId)
+        ->with(['attempts' => function ($q) {
+            $q->orderBy('attempt_no', 'asc');
+        }])
+        ->get();
+
+    // تحقق إذا كل التمارين جاوبة صح بالنهاية
+    $allCorrect = $instances->every(fn($i) => $i->status === 'answered_correct');
+
+    if (!$allCorrect) {
+     return RB::asError(400)
+    ->withHttpCode(400)
+    ->withMessage("لسا ما خلصت الدرس، في تمارين ما انحلت صح")
+    ->build();
+    }
+
+    $totalXp = 0;
+
+    foreach ($instances as $instance) {
+        // جيب أول محاولة صحيحة
+        $firstCorrect = $instance->attempts->firstWhere('is_correct', true);
+
+        if (!$firstCorrect) {
+            continue;
+        }
+
+        $attemptNo = $firstCorrect->attempt_no;
+        $usedHint  = $firstCorrect->used_hint;
+$firsttrycount=$firstCorrect->first_try_count;
+        if ($attemptNo == 1) {
+$firsttrycount+=1;
+            $totalXp += 33; // أول محاولة
+        } elseif ($usedHint) {
+            $totalXp += 27; // صح بعد استخدام hint
+        } else {
+            $totalXp += 30; // صح بعد تكرار بدون hint
+        }
+    }
+
+    // خزّن النتيجة بجدول user_lesson_stats
+    $stats = UserLessonStat::firstOrCreate([
+        'user_id'   => $userId,
+        'lesson_id' => $lessonId,
+    ]);
+
+    $stats->xp_earned = $totalXp;
+    $stats->mastered_at = now();
+    $stats->first_try_count=$firsttrycount;
+    $stats->save();
+
+    return RB::success([
+        'lesson_id' => $lessonId,
+        'xp_total'  => $totalXp,
+        'message'   => "🎉 مبروك! خلصت الدرس وكسبت {$totalXp} XP",
+    ]);
+}
 
 
 

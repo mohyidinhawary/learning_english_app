@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('exerciese_templates', function (Blueprint $table) {
               $table->id();
             $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
+                 $table->foreignId('word_id')->constrained('words')->cascadeOnDelete();
             $table->enum('type', [
                 'mcq','translate','order','listen','speak','match','fill_blank'
             ]);

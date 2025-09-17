@@ -22,6 +22,12 @@ class ExercieseTemplateForm
                     ->relationship('lesson', 'title')
                     ->required(),
 
+
+                    Select::make('word_id')
+                    ->label('word')
+                    ->relationship('word', 'en_text')
+                    ->required(),
+
                 // نوع التمرين
                 Select::make('type')
                     ->label('Exercise Type')
@@ -41,6 +47,15 @@ class ExercieseTemplateForm
                 Textarea::make('question')
                     ->label('Question')
                     ->rows(2),
+// Textarea::make('settings.hint')
+//     ->label('Hint')
+//     ->rows(2)
+//     ->placeholder('اكتب التلميح الذي يظهر للطالب بعد المحاولات')
+//     ->visible(fn ($get) => in_array($get('type'), [
+//         'mcq','translate','order','listen','speak','match','fill_blank'
+//     ])),
+
+
 
                 // الحالة
                 Select::make('status')
@@ -84,7 +99,7 @@ class ExercieseTemplateForm
                     ->label('Audio File')
                     ->acceptedFileTypes(['audio/*'])
                     ->directory('exercises/audio')
-                    ->visible(fn ($get) => in_array($get('type'), ['listen','order'])),
+                    ->visible(fn ($get) => in_array($get('type'), ['listen','order','mcq'])),
 
                 // Speak → prompt نصي
                 Textarea::make('settings.prompt')
@@ -119,6 +134,28 @@ class ExercieseTemplateForm
                 TextInput::make('settings.correct_answer')
                     ->label('Correct Answer')
                     ->visible(fn ($get) => $get('type') === 'fill_blank'),
+
+Repeater::make('settings.hints')
+    ->label('Hints')
+    ->schema([
+        Textarea::make('text')
+            ->label('Hint Text')
+            ->rows(2)
+            ->required(),
+    ])
+    ->visible(fn ($get) => in_array($get('type'), [
+        'translate', 'fill_blank', 'match', 'listen', 'speak',"order"
+    ])),
+
+// Order → التلميحات من نفس الكلمات (items) → Already موجودة
+// Repeater::make('settings.items')
+//     ->schema([
+//         TextInput::make('word')->label('Word'),
+//     ])
+//     ->columns(1)
+//     ->visible(fn ($get) => $get('type') === 'order'),
+
+
             ]);
     }
 }
