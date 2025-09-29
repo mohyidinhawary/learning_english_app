@@ -11,6 +11,7 @@ use App\Http\Resources\ChapterResource;
 use App\Models\Chapter;
 use App\Http\Resources\WordResource;
 use App\Http\Resources\WordSentenceResource;
+use App\Models\ExercieseTemplate;
 use App\Models\Word;
 use App\Models\WordSentence;
 use App\Models\ExerciseInstance;
@@ -191,6 +192,15 @@ $firsttrycount+=1;
     ]);
 }
 
+public function showlessonexerciesies($id){
+$lesson_exercieses=ExercieseTemplate::where('lesson_id',$id)->select('id','type','question')->get( );
+
+
+return RB::success([
+        'lesson_exercieses' => $lesson_exercieses,
+
+    ]);
+}
 
 
 }

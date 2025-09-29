@@ -9,8 +9,11 @@ use App\Http\Controllers\Api\Mobile\LessonController;
 use App\Http\Controllers\Api\Mobile\ExerciesController;
 use App\Http\Controllers\Api\Mobile\FeedbackController;
 use App\Http\Controllers\Api\Mobile\ChapterController;
+use App\Http\Controllers\Api\Mobile\OnboardingController;
+use App\Http\Controllers\Api\Mobile\IssueReportController;
 Route::prefix('api')->group(function () {
 Route::post('user/v1/register', [AuthController::class, 'register']);
+Route::post('user/v1/onboarding', [OnboardingController::class, 'store']);
 Route::post('user/v1/auth', [AuthController::class, 'login']);
 Route::post('user/v1/send-otp', [OtpController::class, 'SendOtp']);
 Route::post('user/v1/validate-otp', [OtpController::class, 'validateOtp']);
@@ -36,6 +39,10 @@ Route::prefix('api')
                 Route::post('user/v1/send-feedback', [FeedbackController::class, 'sendfeedback']);
                 Route::get('user/v1/earned-badges/{id}', [ChapterController::class, 'finalizeChapter']);
                 Route::get('user/v1/word-exercies/{id}', [ExerciesController::class, 'wordExercises']);
+                Route::get('user/v1/user-streak', [ExerciesController::class, 'showuserstreak']);
+                  Route::get('user/v1/lesson-exercieses/{id}', [LessonController::class, 'showlessonexerciesies']);
+                   Route::post('user/v1/issue-reports', [IssueReportController::class, 'store']);
+    Route::get('user/v1/issue-reports', [IssueReportController::class, 'index']);
     });
 
 

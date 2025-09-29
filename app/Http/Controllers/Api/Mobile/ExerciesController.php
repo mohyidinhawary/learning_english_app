@@ -10,6 +10,7 @@ use App\Http\Resources\ExerciesResource;
 use App\Http\Requests\AnswerQuestionRequest;
 use App\Models\ExerciseInstance;
 use App\Models\UserLessonStat;
+use App\Models\UserStreak;
 class ExerciesController extends Controller
 {
    public function showexercies($id){
@@ -194,6 +195,7 @@ public function answerexercies(AnswerQuestionRequest $request, $id)
     //     : "إجابة خاطئة ❌" . ($attemptNo % 3 === 0? " | Hint: " . ($exercise->settings['hint'] ?? 'جرّب تركز على أول حرف 😉') : '');
 
     // ✅ رجّع always success
+    $this->updateStreak($userId);
     return RB::success([
         'user_answer' => $answer,
         'is_correct'  => $isCorrect,
@@ -270,6 +272,49 @@ public function wordExercises($wordId)
                 // ]),
             ];
         }),
+    ]);
+}
+
+
+
+public function updateStreak($userId)
+{
+    $streak = UserStreak::firstOrCreate(['user_id' => $userId]);
+
+    $today = now()->toDateString();
+    $yesterday = now()->subDay()->toDateString();
+
+    if ($streak->last_active_date === $today) {
+        // نفس اليوم → ما منزيد شي
+        return $streak;
+    }
+
+    if ($streak->last_active_date === $yesterday) {
+        // متابع streak
+        $streak->current_streak += 1;
+    } else {
+        // انقطعت السلسلة
+        $streak->current_streak = 1;
+    }
+
+    $streak->last_active_date = $today;
+
+    if ($streak->current_streak > $streak->longest_streak) {
+        $streak->longest_streak = $streak->current_streak;
+    }
+
+    $streak->save();
+
+    return $streak;
+}
+
+
+public function showuserstreak(){
+    $userId   = auth()->id();
+    $userstreak=UserStreak::where('user_id',$userId)->get('current_streak');
+    return RB::success([
+        'userstreak' => $userstreak,
+
     ]);
 }
 
