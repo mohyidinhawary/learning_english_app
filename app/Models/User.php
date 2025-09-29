@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Filament\Panel;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -59,4 +59,13 @@ class User extends Authenticatable
     {
         return $this->is_admin === true;
     }
+
+ public function wordStats()
+{
+    return $this->hasMany(UserWordStat::class);
+}
+  public function wordSentenceStats()
+{
+    return $this->hasMany(UserWordSentenceStat::class);
+}
 }

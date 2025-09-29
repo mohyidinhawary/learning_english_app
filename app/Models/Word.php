@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Word extends Model
 {
     /** @use HasFactory<\Database\Factories\WordFactory> */
@@ -20,4 +20,10 @@ class Word extends Model
     {
         return $this->hasMany(ExercieseTemplate::class, 'word_id');
     }
+
+
+    public function userStats()
+{
+    return $this->hasMany(UserWordStat::class);
+}
 }

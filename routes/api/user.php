@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\Mobile\FeedbackController;
 use App\Http\Controllers\Api\Mobile\ChapterController;
 use App\Http\Controllers\Api\Mobile\OnboardingController;
 use App\Http\Controllers\Api\Mobile\IssueReportController;
+use App\Http\Controllers\Api\Mobile\WordController;
+use App\Http\Controllers\Api\Mobile\SentenceController;
+use App\Http\Controllers\Api\Mobile\ProgressController;
 Route::prefix('api')->group(function () {
 Route::post('user/v1/register', [AuthController::class, 'register']);
 Route::post('user/v1/onboarding', [OnboardingController::class, 'store']);
@@ -43,6 +46,10 @@ Route::prefix('api')
                   Route::get('user/v1/lesson-exercieses/{id}', [LessonController::class, 'showlessonexerciesies']);
                    Route::post('user/v1/issue-reports', [IssueReportController::class, 'store']);
     Route::get('user/v1/issue-reports', [IssueReportController::class, 'index']);
+     Route::post('user/v1/chosen-words', [WordController::class, 'store']);
+     Route::get('user/v1/review', [WordController::class, 'review']);
+      Route::post('user/v1/learned-sentences', [SentenceController::class, 'store']);
+       Route::get('user/v1/user-progress', [ProgressController::class, 'index']);
     });
 
 
