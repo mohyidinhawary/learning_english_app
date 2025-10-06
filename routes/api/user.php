@@ -14,10 +14,12 @@ use App\Http\Controllers\Api\Mobile\IssueReportController;
 use App\Http\Controllers\Api\Mobile\WordController;
 use App\Http\Controllers\Api\Mobile\SentenceController;
 use App\Http\Controllers\Api\Mobile\ProgressController;
+use App\Http\Controllers\Api\Mobile\SubscriptionController;
 Route::prefix('api')->group(function () {
 Route::post('user/v1/register', [AuthController::class, 'register']);
 Route::post('user/v1/onboarding', [OnboardingController::class, 'store']);
 Route::post('user/v1/auth', [AuthController::class, 'login']);
+Route::post('user/v1/google-auth', [AuthController::class, 'loginWithFirebase']);
 Route::post('user/v1/send-otp', [OtpController::class, 'SendOtp']);
 Route::post('user/v1/validate-otp', [OtpController::class, 'validateOtp']);
 Route::post('user/v1/change-password', [ChangePasswordController::class, 'ChnagePassword']);
@@ -50,6 +52,7 @@ Route::prefix('api')
      Route::get('user/v1/review', [WordController::class, 'review']);
       Route::post('user/v1/learned-sentences', [SentenceController::class, 'store']);
        Route::get('user/v1/user-progress', [ProgressController::class, 'index']);
+      Route:: post('/verify-purchase', [SubscriptionController::class, 'verify']);
     });
 
 

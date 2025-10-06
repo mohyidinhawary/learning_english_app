@@ -10,9 +10,18 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
 use Illuminate\Validation\ValidationException;
+use Firebase\Auth\Token\Exception\InvalidToken;
+use Kreait\Firebase\Auth as FirebaseAuth;
 
 class AuthController extends Controller
 {
+
+    //  protected $auth;
+
+    // public function __construct(FirebaseAuth $auth)
+    // {
+    //     $this->auth = $auth;
+    // }
 
     public function register(RegisterRequest $request)
     {
@@ -69,6 +78,33 @@ return RB::asError(500)
                 ->build();
         }
     }
+
+
+
+    // public function loginWithFirebase(Request $request)
+    // {
+    //     $idToken = $request->bearerToken(); // أو $request->input('idToken')
+
+    //     try {
+    //         $verifiedIdToken = $this->auth->verifyIdToken($idToken);
+    //         $uid = $verifiedIdToken->claims()->get('sub');
+
+    //         // هون بتجيب بيانات اليوزر من Firebase أو تخزنه بجدول users
+    //         $firebaseUser = $this->auth->getUser($uid);
+
+    //         $user = User::firstOrCreate(
+    //             ['firebase_uid' => $uid],
+    //             ['email' => $firebaseUser->email]
+    //         );
+
+    //         // رجع JWT/Laravel token عادي
+    //         $token = $user->createToken('api')->plainTextToken;
+
+    //         return response()->json(['token' => $token]);
+    //     } catch (ValidationException $e) {
+    //         return response()->json(['error' => 'Invalid Firebase token'], 401);
+    //     }
+    // }
 
     }
 

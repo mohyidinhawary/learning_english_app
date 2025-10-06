@@ -37,11 +37,11 @@ return [
 
      'firebase' => [
         'android' => [
-            'credentials' =>  base_path(env('FIREBASE_CREDENTIALS_MOBILE')),
+            'credentials' =>  base_path(env('FIREBASE_CREDENTIALS')),
         ],
-        'web' => [
-            'credentials' =>  base_path(env('FIREBASE_CREDENTIALS_WEB')),
-        ],
-    ],
+    //     'web' => [
+    //         'credentials' =>  base_path(env('FIREBASE_CREDENTIALS_WEB')),
+    //     ],
+     ],
 
 ];

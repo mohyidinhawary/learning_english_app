@@ -9,7 +9,7 @@ class Lesson extends Model
 {
     /** @use HasFactory<\Database\Factories\LessonFactory> */
     use HasFactory;
-     protected $fillable = ['chapter_id','title','position','is_free','difficulty','status'];
+     protected $fillable = ['chapter_id','title','position','is_free','difficulty','status','xp'];
     protected $casts = [ 'is_free' => 'boolean' ];
 
     public function chapter() { return $this->belongsTo(Chapter::class); }

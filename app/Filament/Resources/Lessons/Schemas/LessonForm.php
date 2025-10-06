@@ -38,6 +38,7 @@ class LessonForm
                 Toggle::make('is_free')
               ->label('free')
               ->default(false),
+                TextInput::make('xp'),
 
             ]);
     }

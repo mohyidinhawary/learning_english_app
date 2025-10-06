@@ -30,6 +30,13 @@ class ExercieseTemplateForm
                     ->relationship('word', 'en_text')
                     ->required(),
 
+                     Select::make('difficulty')
+                ->label('difficulty')->options([
+                    'easy'   => 'Easy',
+                    'medium' => 'Medium',
+                    'hard'   => 'Hard',
+                ]),
+
                 // نوع التمرين
                 Select::make('type')
                     ->label('Exercise Type')

@@ -11,10 +11,10 @@ class FCMRepository
 {
     protected $messaging;
 
-    public function __construct(string $deviceType = 'web')
+    public function __construct(string $deviceType = 'android')
     {
         $configPath = match ($deviceType) {
-            'web' => config('services.firebase.web.credentials'),
+            // 'web' => config('services.firebase.web.credentials'),
             'android' => config('services.firebase.android.credentials'),
             default => config('services.firebase.android.credentials'),
         };

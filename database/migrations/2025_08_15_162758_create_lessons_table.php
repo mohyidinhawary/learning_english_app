@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_free')->default(false);
             $table->string('difficulty')->nullable();
             $table->string('status')->default('draft');
+             $table->unsignedInteger('xp')->default(0);
             $table->timestamps();
 
             $table->unique(['chapter_id','position']);

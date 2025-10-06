@@ -16,7 +16,7 @@ class NotificationService
     public function __construct(string $deviceType = 'android')
     {
         $configPath = match ($deviceType) {
-            'web' => config('services.firebase.web.credentials'),
+            // 'web' => config('services.firebase.web.credentials'),
             'android' => config('services.firebase.android.credentials'),
         };
 
@@ -35,7 +35,7 @@ class NotificationService
             ->where('deviceable_type', $userType)
             ->where('device_type', $deviceType)
             ->pluck('device_token');
-        
+
         if ($tokens->isEmpty()) {
             return $this->storeNotification($userId, $userType, $title, $body, 'failed');
         }
