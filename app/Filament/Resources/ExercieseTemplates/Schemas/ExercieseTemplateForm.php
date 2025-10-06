@@ -10,12 +10,14 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\FileUpload;
 
+
 class ExercieseTemplateForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
+
                 // الدرس المرتبط
                 Select::make('lesson_id')
                     ->label('Lesson')
@@ -27,6 +29,13 @@ class ExercieseTemplateForm
                     ->label('word')
                     ->relationship('word', 'en_text')
                     ->required(),
+
+                     Select::make('difficulty')
+                ->label('difficulty')->options([
+                    'easy'   => 'Easy',
+                    'medium' => 'Medium',
+                    'hard'   => 'Hard',
+                ]),
 
                 // نوع التمرين
                 Select::make('type')

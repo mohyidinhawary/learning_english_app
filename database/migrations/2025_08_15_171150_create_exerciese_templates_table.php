@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('question')->nullable();
             $table->json('settings')->nullable();
             $table->enum('status', ['draft','active','inactive'])->default('draft');
+              $table->string('difficulty')->nullable();
             $table->timestamps();
         });
     }

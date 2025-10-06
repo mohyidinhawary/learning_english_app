@@ -11,10 +11,12 @@ use App\Http\Resources\ChapterResource;
 use App\Models\Chapter;
 use App\Http\Resources\WordResource;
 use App\Http\Resources\WordSentenceResource;
+use App\Models\ExercieseTemplate;
 use App\Models\Word;
 use App\Models\WordSentence;
 use App\Models\ExerciseInstance;
 use App\Models\UserLessonStat;
+use App\Services\EventLogger;
 class LessonController extends Controller
 {
    public function showchapterlessons($id){
@@ -163,13 +165,16 @@ public function finalizeLesson($lessonId)
         $attemptNo = $firstCorrect->attempt_no;
         $usedHint  = $firstCorrect->used_hint;
 $firsttrycount=$firstCorrect->first_try_count;
+
+$lesson = Lesson::findOrFail($lessonId);
+$baseXp = $lesson->xp; // القيمة الأساسية المخزنة بالجدول
         if ($attemptNo == 1) {
 $firsttrycount+=1;
-            $totalXp += 33; // أول محاولة
+            $totalXp = $baseXp; // أول محاولة
         } elseif ($usedHint) {
-            $totalXp += 27; // صح بعد استخدام hint
+            $totalXp =$baseXp-6; // صح بعد استخدام hint
         } else {
-            $totalXp += 30; // صح بعد تكرار بدون hint
+            $totalXp =$baseXp-3; // صح بعد تكرار بدون hint
         }
     }
 
@@ -181,8 +186,19 @@ $firsttrycount+=1;
 
     $stats->xp_earned = $totalXp;
     $stats->mastered_at = now();
-    $stats->first_try_count=$firsttrycount;
+    $stats->first_try_count=$firsttrycount?? 0;
     $stats->save();
+ EventLogger::record('xp_gained', [
+        'user_id'   => $userId,
+        'lesson_id' => $lessonId,
+        'xp'        => $totalXp,
+        'base_xp'   => $baseXp,
+        'first_try' => $firsttrycount,
+        'time'      => now()->toIso8601String(),
+    ]);
+
+
+
 
     return RB::success([
         'lesson_id' => $lessonId,
@@ -191,6 +207,15 @@ $firsttrycount+=1;
     ]);
 }
 
+public function showlessonexerciesies($id){
+$lesson_exercieses=ExercieseTemplate::where('lesson_id',$id)->select('id','type','question','difficulty')->get( );
+
+
+return RB::success([
+        'lesson_exercieses' => $lesson_exercieses,
+
+    ]);
+}
 
 
 }
